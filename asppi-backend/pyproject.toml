@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "asppi-backend"
+version = "0.1.0"
+description = ""
+authors = ["Ivan Nikolaev-Axenov <nikolaevaxenov@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.105.0"
+uvicorn = "^0.24.0.post1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
