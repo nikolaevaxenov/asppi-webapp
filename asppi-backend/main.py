@@ -1,10 +1,10 @@
 from fastapi import FastAPI
-from routers import test_route, troyka, polaris_checkmku, polaris_onload
+from routers import rc, cl, da1, wt
 
 
 app = FastAPI()
 
-app.include_router(test_route.router)
-app.include_router(troyka.router)
-app.include_router(polaris_checkmku.router)
-app.include_router(polaris_onload.router)
+app.include_router(rc.router)
+app.include_router(cl.router)
+app.include_router(da1.router)
+app.include_router(wt.router)
