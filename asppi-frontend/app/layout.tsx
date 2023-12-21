@@ -1,4 +1,5 @@
 import { Providers } from "./providers";
+import Head from "./head";
 import "@/styles/globals.scss";
 
 export default function RootLayout({
@@ -8,6 +9,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <Head />
       <body>
         <Providers>
           <div className="wrapper">

@@ -14,7 +14,10 @@ import {
 import { getWT } from "@/services/getData";
 
 export default function MainParametersChartComponent() {
-  const { isLoading, error, data, isFetching } = useQuery("wtData", getWT);
+  const { isLoading, error, data, isFetching } = useQuery("wtData", getWT, {
+    refetchInterval: 60000,
+    refetchOnWindowFocus: false,
+  });
 
   if (isLoading || isFetching) return <div>Загрузка...</div>;
   if (error) return <div>Ошибка загрузки данных!</div>;
@@ -45,7 +48,14 @@ export default function MainParametersChartComponent() {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="Дата/время" />
-          <YAxis />
+          <YAxis
+            tickFormatter={(value) =>
+              new Intl.NumberFormat("ru-RU", {
+                notation: "compact",
+                compactDisplay: "short",
+              }).format(value)
+            }
+          />
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="Мощность" stroke="#8884d8" />
@@ -63,7 +73,14 @@ export default function MainParametersChartComponent() {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="Дата/время" />
-          <YAxis />
+          <YAxis
+            tickFormatter={(value) =>
+              new Intl.NumberFormat("ru-RU", {
+                notation: "compact",
+                compactDisplay: "short",
+              }).format(value)
+            }
+          />
           <Tooltip />
           <Legend />
           <Line
@@ -85,7 +102,14 @@ export default function MainParametersChartComponent() {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="Дата/время" />
-          <YAxis />
+          <YAxis
+            tickFormatter={(value) =>
+              new Intl.NumberFormat("ru-RU", {
+                notation: "compact",
+                compactDisplay: "short",
+              }).format(value)
+            }
+          />
           <Tooltip />
           <Legend />
           <Line

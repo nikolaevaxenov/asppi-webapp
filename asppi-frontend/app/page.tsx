@@ -9,11 +9,11 @@ export default function Home() {
       <h1>Состояние программ АСППИ</h1>
       <SoftwareConditionComponent />
 
-      <h1>Текущее состояние энергоблока</h1>
-      <StateOfThePowerUnitComponent />
-
-      <h1>График основных параметров</h1>
+      <h1>Графики основных параметров</h1>
       <MainParametersChartComponent />
+
+      <h1>Текущие нейтронно-физические характеристики</h1>
+      <StateOfThePowerUnitComponent />
     </div>
   );
 }

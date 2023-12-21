@@ -4,7 +4,10 @@ import { useQuery } from "react-query";
 import { getRC } from "@/services/getData";
 
 export default function SoftwareConditionComponent() {
-  const { isLoading, error, data, isFetching } = useQuery("rcData", getRC);
+  const { isLoading, error, data, isFetching } = useQuery("rcData", getRC, {
+    refetchInterval: 60000,
+    refetchOnWindowFocus: false,
+  });
 
   if (isLoading || isFetching) return <div>Загрузка...</div>;
   if (error) return <div>Ошибка загрузки данных!</div>;
