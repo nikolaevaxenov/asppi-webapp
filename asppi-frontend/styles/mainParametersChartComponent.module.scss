@@ -45,3 +45,14 @@
     }
   }
 }
+
+.charts {
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+  margin: 1em 5em;
+
+  @media (max-width: 812px) {
+    margin: 1em;
+  }
+}

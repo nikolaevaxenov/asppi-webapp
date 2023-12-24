@@ -1,0 +1,9 @@
+@import "@/styles/colors.scss";
+
+.main {
+  padding: 1em 2em;
+  text-align: center;
+  font-size: large;
+  font-weight: bold;
+  background-color: darken($main-bg, 10);
+}

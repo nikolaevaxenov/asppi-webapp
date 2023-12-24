@@ -1,4 +1,5 @@
 from utils import database
+from collections import defaultdict
 import struct
 import datetime
 
@@ -11,7 +12,7 @@ def ole_to_epoch(ole):
 
 def interpret_RC():
     data = database.get_RC()
-    result = []
+    result = defaultdict(list)
 
     for line in data:
         funit = line[0]
@@ -50,7 +51,7 @@ def interpret_RC():
         dt16 = ole_to_epoch(struct.unpack('d', fdata[135:143])[0])
         rc16 = int.from_bytes(fdata[143:144])
         
-        result.append(sorted([
+        result[funit].append(sorted([
             [dt1, "Обновление данных о состоянии РУ в БД РУ", "УСПЕХ" if rc1==0 else ("Недоступность файлов ИИС" if rc1==1 else ("Необновление файлов ИИС за заданный интервал времени" if rc1==2 else "Прочее"))],
             [dt2, "Обновление данных о состоянии РУ в мапируемых областях памяти", "УСПЕХ" if rc2==0 else ("Отказ доступа к БД РУ" if rc2==1 else ("Начало операции" if rc2==2 else "Прочее"))],
             [dt3, "Формирование команды проведения расчета по программам РАСЧЕТ И ПРОВЕРКА", "Код: " + str(rc3)],
@@ -74,12 +75,13 @@ def interpret_RC():
 
 def interpret_CL():
     data = database.get_CL()
-    result = []
+    result = defaultdict(list)
 
     for line in data:
+        funit = line[0]
         fdata = line[1].read()
 
-        result.append([
+        result[funit].append([
             ["Дата/время окончания окончания предыдущего расчета", ole_to_epoch(struct.unpack('d', fdata[348348:348356])[0])],
             ["Дата/время окончания расчета", ole_to_epoch(struct.unpack('d', fdata[348356:348364])[0])],
             ["Полное число работоспособных ВРДР 1к / ВРДР2", struct.unpack('h', fdata[0:2])[0]],
@@ -209,12 +211,13 @@ def interpret_CL():
 
 def interpret_DA1():
     data = database.get_DA1()
-    result = []
+    result = defaultdict(list)
 
     for line in data:
+        funit = line[0]
         fdata = line[1]
 
-        result.append([
+        result[funit].append([
             ["Дата/время сохранения таблицы DA", ole_to_epoch(struct.unpack('d', fdata[12716:12724])[0])],
             # ["Глубина погружения стержней СУЗ (cм)", struct.unpack('h', fdata[0:2])[0]],
             ["Расходы теплоносителя в ТК и каналах КОСУЗ", struct.unpack('f', fdata[456:460])[0]],
@@ -263,20 +266,17 @@ def interpret_DA1():
 
 def interpret_WT():
     data = database.get_WT()
-    result = []
+    result = defaultdict(list)
 
     wtlen = 20
-    wt_datetime = []
-    wtw = []
-    wtxe = []
-    wti = []
 
     for line in data:
+        funit = line[0]
         fdata = line[1]
         for i in range(int(len(fdata)/wtlen)):
             dt = struct.unpack('d', fdata[i*wtlen:i*wtlen+8])[0]
             if dt > 0:
-                result.append([
+                result[funit].append([
                     "Дата/время",
                     ole_to_epoch(dt),
                     "Мощность",

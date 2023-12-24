@@ -1,5 +1,7 @@
 "use client";
 
+import styles from "@/styles/mainParametersChartComponent.module.scss";
+import Carousel from "nuka-carousel";
 import { useQuery } from "react-query";
 import {
   LineChart,
@@ -12,6 +14,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { getWT } from "@/services/getData";
+import {
+  IoIosArrowDropleftCircle,
+  IoIosArrowDroprightCircle,
+} from "react-icons/io";
 
 export default function MainParametersChartComponent() {
   const { isLoading, error, data, isFetching } = useQuery("wtData", getWT, {
@@ -22,103 +28,131 @@ export default function MainParametersChartComponent() {
   if (isLoading || isFetching) return <div>Загрузка...</div>;
   if (error) return <div>Ошибка загрузки данных!</div>;
 
-  const resultArray = data.map((row) => {
-    return {
-      "Дата/время": row[1],
-      Мощность: row[3],
-      "Концентрация ксенона 135": row[5],
-      "Концентрация йода 135": row[7],
-    };
-  });
+  const convertData = (inputData) => {
+    const outputData = {};
 
-  const chartData = resultArray.reverse();
-  console.log(chartData);
+    for (const key in inputData) {
+      outputData[key] = inputData[key].map((row) => {
+        const newRow = {};
+        for (let i = 0; i < row.length; i += 2) {
+          newRow[row[i]] = row[i + 1];
+        }
+        return newRow;
+      });
+    }
+
+    return outputData;
+  };
+
+  const chartData = convertData(data);
 
   return (
-    <div>
-      <ResponsiveContainer height={300}>
-        <LineChart
-          data={chartData}
-          margin={{
-            top: 5,
-            right: 150,
-            left: 150,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="Дата/время" />
-          <YAxis
-            tickFormatter={(value) =>
-              new Intl.NumberFormat("ru-RU", {
-                notation: "compact",
-                compactDisplay: "short",
-              }).format(value)
-            }
-          />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="Мощность" stroke="#8884d8" />
-        </LineChart>
-      </ResponsiveContainer>
-      <ResponsiveContainer height={300}>
-        <LineChart
-          data={chartData}
-          margin={{
-            top: 5,
-            right: 150,
-            left: 150,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="Дата/время" />
-          <YAxis
-            tickFormatter={(value) =>
-              new Intl.NumberFormat("ru-RU", {
-                notation: "compact",
-                compactDisplay: "short",
-              }).format(value)
-            }
-          />
-          <Tooltip />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="Концентрация ксенона 135"
-            stroke="#82ca9d"
-          />
-        </LineChart>
-      </ResponsiveContainer>
-      <ResponsiveContainer height={300}>
-        <LineChart
-          data={chartData}
-          margin={{
-            top: 5,
-            right: 150,
-            left: 150,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="Дата/время" />
-          <YAxis
-            tickFormatter={(value) =>
-              new Intl.NumberFormat("ru-RU", {
-                notation: "compact",
-                compactDisplay: "short",
-              }).format(value)
-            }
-          />
-          <Tooltip />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="Концентрация йода 135"
-            stroke="#82ca9d"
-          />
-        </LineChart>
-      </ResponsiveContainer>
+    <div className={styles.main}>
+      <Carousel
+        renderBottomCenterControls={false}
+        renderCenterLeftControls={({ previousSlide }) => (
+          <button onClick={previousSlide}>
+            <IoIosArrowDropleftCircle />
+          </button>
+        )}
+        renderCenterRightControls={({ nextSlide }) => (
+          <button onClick={nextSlide}>
+            <IoIosArrowDroprightCircle />
+          </button>
+        )}
+      >
+        {!!data ? (
+          Object.keys(chartData).map((key) => {
+            console.log(chartData[key]);
+            return (
+              <div>
+                <p>Информация по блоку {key}</p>
+                <div className={styles.charts}>
+                  <ResponsiveContainer height={300}>
+                    <LineChart
+                      data={chartData[key]}
+                      margin={{
+                        right: 10,
+                        left: 10,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="Дата/время" />
+                      <YAxis
+                        tickFormatter={(value) =>
+                          Number.parseFloat(value).toExponential()
+                        }
+                      />
+                      <Tooltip />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="Мощность"
+                        stroke="#fbf8cc"
+                        strokeWidth={5}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <ResponsiveContainer height={300}>
+                    <LineChart
+                      data={chartData[key]}
+                      margin={{
+                        right: 10,
+                        left: 10,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="Дата/время" />
+                      <YAxis
+                        tickFormatter={(value) =>
+                          Number.parseFloat(value).toExponential()
+                        }
+                      />
+                      <Tooltip />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="Концентрация ксенона 135"
+                        stroke="#f1c0e8"
+                        strokeWidth={5}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <ResponsiveContainer height={300}>
+                    <LineChart
+                      data={chartData[key]}
+                      margin={{
+                        right: 10,
+                        left: 10,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="Дата/время" />
+                      <YAxis
+                        tickFormatter={(value) =>
+                          Number.parseFloat(value).toExponential()
+                        }
+                      />
+                      <Tooltip />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="Концентрация йода 135"
+                        stroke="#ffd166"
+                        strokeWidth={5}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <tr>
+            <td>Загрузка...</td>
+          </tr>
+        )}
+      </Carousel>
     </div>
   );
 }
