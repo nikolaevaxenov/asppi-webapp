@@ -1,23 +1,30 @@
+# Импорт необходимых библиотек и модулей
 from utils import database
 from collections import defaultdict
 import struct
 import datetime
 
-
+# Функция для преобразования значения OLE (OLE Automation Date) в формат даты и времени
 def ole_to_epoch(ole):
     days = int(ole)
     hours = abs(ole - days) * 24
     return datetime.datetime(1899, 12, 30, 0, 0, 0) + datetime.timedelta(days=int(ole), hours=hours)
 
 
+# Функция для интерпретации данных по состоянию RC из базы данных
 def interpret_RC():
-    data = database.get_RC()
+    # Получение данных из базы данных по состоянию RC
+    data = database.get_RC_from_database()
+
+    # Инициализация словаря для хранения результатов
     result = defaultdict(list)
 
+    # Итерация по данным из базы данных
     for line in data:
         funit = line[0]
         fdata = line[1]
 
+        # Распаковка данных и преобразование их в удобный формат
         dt1 = ole_to_epoch(struct.unpack('d', fdata[:8])[0])
         rc1 = int.from_bytes(fdata[8:9])
         dt2 = ole_to_epoch(struct.unpack('d', fdata[9:17])[0])
@@ -51,6 +58,7 @@ def interpret_RC():
         dt16 = ole_to_epoch(struct.unpack('d', fdata[135:143])[0])
         rc16 = int.from_bytes(fdata[143:144])
         
+        # Формирование результатов в виде списка списков, содержащих дату, описание события и статус
         result[funit].append(sorted([
             [dt1, "Обновление данных о состоянии РУ в БД РУ", "УСПЕХ" if rc1==0 else ("Недоступность файлов ИИС" if rc1==1 else ("Необновление файлов ИИС за заданный интервал времени" if rc1==2 else "Прочее"))],
             [dt2, "Обновление данных о состоянии РУ в мапируемых областях памяти", "УСПЕХ" if rc2==0 else ("Отказ доступа к БД РУ" if rc2==1 else ("Начало операции" if rc2==2 else "Прочее"))],
@@ -72,15 +80,20 @@ def interpret_RC():
 
     return result
 
-
+# Функция для интерпретации данных по состоянию CL из базы данных
 def interpret_CL():
-    data = database.get_CL()
+    # Получение данных из базы данных по состоянию CL
+    data = database.get_CL_from_database()
+
+    # Инициализация словаря для хранения результатов
     result = defaultdict(list)
 
+    # Итерация по данным из базы данных
     for line in data:
         funit = line[0]
         fdata = line[1].read()
 
+        # Формирование структурированного результата в виде списка списков
         result[funit].append([
             ["Дата/время окончания окончания предыдущего расчета", ole_to_epoch(struct.unpack('d', fdata[348348:348356])[0])],
             ["Дата/время окончания расчета", ole_to_epoch(struct.unpack('d', fdata[348356:348364])[0])],
@@ -204,19 +217,25 @@ def interpret_CL():
             # ["Среднее паросодержание теплоносителя на выходе из ТК, %", struct.unpack('f', fdata[416752:416756])[0]],
         ])
 
+        # Закрытие потока после считывания данных
         line[1].close()
     return result
 
 
-
+# Функция для интерпретации данных по таблице DA1 из базы данных
 def interpret_DA1():
-    data = database.get_DA1()
+    # Получение данных из базы данных по таблице DA1
+    data = database.get_DA1_from_database()
+
+    # Инициализация словаря для хранения результатов
     result = defaultdict(list)
 
+    # Итерация по данным из базы данных
     for line in data:
         funit = line[0]
         fdata = line[1]
 
+        # Формирование структурированного результата в виде списка списков
         result[funit].append([
             ["Дата/время сохранения таблицы DA", ole_to_epoch(struct.unpack('d', fdata[12716:12724])[0])],
             # ["Глубина погружения стержней СУЗ (cм)", struct.unpack('h', fdata[0:2])[0]],
@@ -264,17 +283,27 @@ def interpret_DA1():
     return result
 
 
+# Функция для интерпретации данных WT из базы данных
 def interpret_WT():
-    data = database.get_WT()
+    # Получение данных из базы данных по WT
+    data = database.get_WT_from_database()
+
+    # Инициализация словаря для хранения результатов
     result = defaultdict(list)
 
+    # Количество байт на одну запись данных
     wtlen = 20
 
+    # Итерация по данным из базы данных
     for line in data:
         funit = line[0]
         fdata = line[1]
+
+        # Цикл для обработки каждой записи данных
         for i in range(int(len(fdata)/wtlen)):
             dt = struct.unpack('d', fdata[i*wtlen:i*wtlen+8])[0]
+
+            # Проверка, что дата/время больше 0 (некоторые данные могут быть неопределенными)
             if dt > 0:
                 result[funit].append([
                     "Дата/время",
@@ -288,29 +317,3 @@ def interpret_WT():
                 ])
 
     return result
-
-
-def main():
-    pass
-    # rc = interpret_RC()
-    # for l in rc:
-    #     print(l)
-
-    # cl = interpret_CL()
-    # for l in cl:
-    #     for i in l:
-    #         print(i)
-
-    # da1 = interpret_DA1()
-    # for l in da1:
-    #     for i in l:
-    #         print(i)
-
-    # wt = interpret_WT()
-    # for l in wt:
-    #     print(l)
-
-
-if __name__=='__main__':
-    main()
-
