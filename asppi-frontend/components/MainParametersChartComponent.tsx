@@ -1,7 +1,13 @@
+// Инструкция "use client" указывает на использование клиентского (браузерного) режима.
 "use client";
 
+// Импорт стилей из модуля mainParametersChartComponent.module.scss.
 import styles from "@/styles/mainParametersChartComponent.module.scss";
+
+// Импорт компонента Carousel из библиотеки nuka-carousel.
 import Carousel from "nuka-carousel";
+
+// Импорт хуков и компонентов для работы с запросами и графиками.
 import { useQuery } from "react-query";
 import {
   LineChart,
@@ -13,24 +19,35 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+
+// Импорт функции getWT из сервиса getData.
 import { getWT } from "@/services/getData";
+
+// Импорт иконок из библиотеки react-icons/io.
 import {
   IoIosArrowDropleftCircle,
   IoIosArrowDroprightCircle,
 } from "react-icons/io";
 
+// Экспортируемый по умолчанию функциональный компонент MainParametersChartComponent.
 export default function MainParametersChartComponent() {
+  // Используем хук useQuery для получения данных о тепловыделении.
   const { isLoading, error, data, isFetching } = useQuery("wtData", getWT, {
-    refetchInterval: 60000,
-    refetchOnWindowFocus: false,
+    refetchInterval: 60000, // Интервал автоматического обновления данных в миллисекундах.
+    refetchOnWindowFocus: false, // Отключение автоматического обновления при фокусе на окне браузера.
   });
 
+  // Если данные загружаются или выполняется обновление, отображаем сообщение о загрузке.
   if (isLoading || isFetching) return <div>Загрузка...</div>;
+
+  // Если произошла ошибка при загрузке данных, отображаем сообщение об ошибке.
   if (error) return <div>Ошибка загрузки данных!</div>;
 
+  // Функция для преобразования полученных данных в удобный формат для графиков.
   const convertData = (inputData) => {
     const outputData = {};
 
+    // Проходим по ключам входных данных и преобразуем каждый набор данных.
     for (const key in inputData) {
       outputData[key] = inputData[key].map((row) => {
         const newRow = {};
@@ -44,10 +61,13 @@ export default function MainParametersChartComponent() {
     return outputData;
   };
 
+  // Преобразуем полученные данные.
   const chartData = convertData(data);
 
   return (
+    // Обертка для содержимого компонента с применением стилей из модуля.
     <div className={styles.main}>
+      {/* Карусель для пролистывания блоков данных. */}
       <Carousel
         renderBottomCenterControls={false}
         renderCenterLeftControls={({ previousSlide }) => (
@@ -61,13 +81,19 @@ export default function MainParametersChartComponent() {
           </button>
         )}
       >
+        {/* Проверка наличия данных перед отображением графиков. */}
         {!!data ? (
+          // Проходим по ключам данных и отображаем графики для каждого блока.
           Object.keys(chartData).map((key) => {
             console.log(chartData[key]);
             return (
               <div>
+                {/* Заголовок с информацией о блоке данных. */}
                 <p>Информация по блоку {key}</p>
+
+                {/* Обертка для графиков с применением стилей из модуля. */}
                 <div className={styles.charts}>
+                  {/* График мощности. */}
                   <ResponsiveContainer height={300}>
                     <LineChart
                       data={chartData[key]}
@@ -93,6 +119,8 @@ export default function MainParametersChartComponent() {
                       />
                     </LineChart>
                   </ResponsiveContainer>
+
+                  {/* График концентрации ксенона 135. */}
                   <ResponsiveContainer height={300}>
                     <LineChart
                       data={chartData[key]}
@@ -118,6 +146,8 @@ export default function MainParametersChartComponent() {
                       />
                     </LineChart>
                   </ResponsiveContainer>
+
+                  {/* График концентрации йода 135. */}
                   <ResponsiveContainer height={300}>
                     <LineChart
                       data={chartData[key]}
@@ -148,6 +178,7 @@ export default function MainParametersChartComponent() {
             );
           })
         ) : (
+          // Если данные загружаются, но пока не доступны, отображаем сообщение о загрузке.
           <tr>
             <td>Загрузка...</td>
           </tr>
