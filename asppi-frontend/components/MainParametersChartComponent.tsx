@@ -28,9 +28,13 @@ import {
   IoIosArrowDropleftCircle,
   IoIosArrowDroprightCircle,
 } from "react-icons/io";
+import { useCarouselStore } from "@/hooks/useCarouselStore";
 
 // Экспортируемый по умолчанию функциональный компонент MainParametersChartComponent.
 export default function MainParametersChartComponent() {
+  const carouselIndex = useCarouselStore((state) => state.index);
+  const updateIndex = useCarouselStore((state) => state.updateIndex);
+
   // Используем хук useQuery для получения данных о тепловыделении.
   const { isLoading, error, data, isFetching } = useQuery("wtData", getWT, {
     refetchInterval: 60000, // Интервал автоматического обновления данных в миллисекундах.
@@ -64,6 +68,22 @@ export default function MainParametersChartComponent() {
   // Преобразуем полученные данные.
   const chartData = convertData(data);
 
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div
+          className="custom-tooltip"
+          style={{ backgroundColor: "#457b9d", padding: "0.5em" }}
+        >
+          <p className="intro">{label}</p>
+          <p className="label">{`${payload[0].name}: ${payload[0].value}`}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     // Обертка для содержимого компонента с применением стилей из модуля.
     <div className={styles.main}>
@@ -80,16 +100,17 @@ export default function MainParametersChartComponent() {
             <IoIosArrowDroprightCircle />
           </button>
         )}
+        slideIndex={carouselIndex}
+        afterSlide={updateIndex}
       >
         {/* Проверка наличия данных перед отображением графиков. */}
         {!!data ? (
           // Проходим по ключам данных и отображаем графики для каждого блока.
           Object.keys(chartData).map((key) => {
-            console.log(chartData[key]);
             return (
               <div>
                 {/* Заголовок с информацией о блоке данных. */}
-                <p>Информация по блоку {key}</p>
+                <p>Информация о блоке {key}</p>
 
                 {/* Обертка для графиков с применением стилей из модуля. */}
                 <div className={styles.charts}>
@@ -103,13 +124,14 @@ export default function MainParametersChartComponent() {
                       }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="Дата/время" />
+                      <XAxis dataKey="Дата/время" tick={{ fill: "#f1faee" }} />
                       <YAxis
+                        tick={{ fill: "#f1faee" }}
                         tickFormatter={(value) =>
                           Number.parseFloat(value).toExponential()
                         }
                       />
-                      <Tooltip />
+                      <Tooltip content={<CustomTooltip />} />
                       <Legend />
                       <Line
                         type="monotone"
@@ -130,13 +152,14 @@ export default function MainParametersChartComponent() {
                       }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="Дата/время" />
+                      <XAxis dataKey="Дата/время" tick={{ fill: "#f1faee" }} />
                       <YAxis
+                        tick={{ fill: "#f1faee" }}
                         tickFormatter={(value) =>
                           Number.parseFloat(value).toExponential()
                         }
                       />
-                      <Tooltip />
+                      <Tooltip content={<CustomTooltip />} />
                       <Legend />
                       <Line
                         type="monotone"
@@ -157,13 +180,15 @@ export default function MainParametersChartComponent() {
                       }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="Дата/время" />
+                      <XAxis dataKey="Дата/время" tick={{ fill: "#f1faee" }} />
                       <YAxis
+                        tick={{ fill: "#f1faee" }}
                         tickFormatter={(value) =>
                           Number.parseFloat(value).toExponential()
                         }
                       />
-                      <Tooltip />
+                      />
+                      <Tooltip content={<CustomTooltip />} />
                       <Legend />
                       <Line
                         type="monotone"

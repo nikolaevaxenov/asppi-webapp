@@ -11,6 +11,9 @@ def ole_to_epoch(ole):
     return datetime.datetime(1899, 12, 30, 0, 0, 0) + datetime.timedelta(days=int(ole), hours=hours)
 
 
+letter_to_number = lambda letter: ord(letter.upper()) - ord('A') + 1 if letter.isalpha() else None
+
+
 # Функция для интерпретации данных по состоянию RC из базы данных
 def interpret_RC():
     # Получение данных из базы данных по состоянию RC
@@ -21,7 +24,7 @@ def interpret_RC():
 
     # Итерация по данным из базы данных
     for line in data:
-        funit = line[0]
+        funit = letter_to_number(line[0])
         fdata = line[1]
 
         # Распаковка данных и преобразование их в удобный формат
@@ -90,7 +93,7 @@ def interpret_CL():
 
     # Итерация по данным из базы данных
     for line in data:
-        funit = line[0]
+        funit = letter_to_number(line[0])
         fdata = line[1].read()
 
         # Формирование структурированного результата в виде списка списков
@@ -232,7 +235,7 @@ def interpret_DA1():
 
     # Итерация по данным из базы данных
     for line in data:
-        funit = line[0]
+        funit = letter_to_number(line[0])
         fdata = line[1]
 
         # Формирование структурированного результата в виде списка списков
@@ -296,7 +299,7 @@ def interpret_WT():
 
     # Итерация по данным из базы данных
     for line in data:
-        funit = line[0]
+        funit = letter_to_number(line[0])
         fdata = line[1]
 
         # Цикл для обработки каждой записи данных

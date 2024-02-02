@@ -16,9 +16,13 @@ import {
   IoIosArrowDropleftCircle,
   IoIosArrowDroprightCircle,
 } from "react-icons/io";
+import { useCarouselStore } from "@/hooks/useCarouselStore";
 
 // Экспортируемый по умолчанию функциональный компонент StateOfThePowerUnitComponent.
 export default function StateOfThePowerUnitComponent() {
+  const carouselIndex = useCarouselStore((state) => state.index);
+  const updateIndex = useCarouselStore((state) => state.updateIndex);
+
   // Используем хуки useQuery для получения данных о состоянии блоков CL и DA1.
   const {
     isLoading: isLoadingCL,
@@ -62,6 +66,8 @@ export default function StateOfThePowerUnitComponent() {
             <IoIosArrowDroprightCircle />
           </button>
         )}
+        slideIndex={carouselIndex}
+        afterSlide={updateIndex}
       >
         {/* Проверка наличия данных перед отображением таблиц. */}
         {!!dataCL && !!dataDA1 ? (
@@ -70,34 +76,34 @@ export default function StateOfThePowerUnitComponent() {
             return (
               <div>
                 {/* Заголовок с информацией о блоке данных. */}
-                <p>Информация по блоку {key}</p>
+                <p>Информация о блоке {key}</p>
 
                 {/* Проверка наличия данных о дате/времени окончания предыдущего расчета для блока CL. */}
-                {dataCL[key][0][0][1] !== "1899-12-30T00:00:00" && (
+                {dataCL[key]?.[0]?.[0]?.[1] !== "1899-12-30T00:00:00" && (
                   <p>
                     Дата/время окончания предыдущего расчета:{" "}
                     {new Date(
-                      dataCL[key][0][0][1].toLocaleString("ru-RU")
+                      dataCL[key]?.[0]?.[0]?.[1].toLocaleString("ru-RU")
                     ).toLocaleString("ru-RU")}
                   </p>
                 )}
 
                 {/* Проверка наличия данных о дате/времени окончания текущего расчета для блока CL. */}
-                {dataCL[key][0][1][1] !== "1899-12-30T00:00:00" && (
+                {dataCL[key]?.[0]?.[1]?.[1] !== "1899-12-30T00:00:00" && (
                   <p>
                     Дата/время окончания расчета:{" "}
                     {new Date(
-                      dataCL[key][0][1][1].toLocaleString("ru-RU")
+                      dataCL[key]?.[0]?.[1]?.[1].toLocaleString("ru-RU")
                     ).toLocaleString("ru-RU")}
                   </p>
                 )}
 
                 {/* Проверка наличия данных о дате/времени сохранения таблицы DA для блока DA1. */}
-                {dataDA1[key][0][0][1] !== "1899-12-30T00:00:00" && (
+                {dataDA1[key]?.[0]?.[0]?.[1] !== "1899-12-30T00:00:00" && (
                   <p>
                     Дата/время сохранения таблицы DA:{" "}
                     {new Date(
-                      dataDA1[key][0][0][1].toLocaleString("ru-RU")
+                      dataDA1[key]?.[0]?.[0]?.[1].toLocaleString("ru-RU")
                     ).toLocaleString("ru-RU")}
                   </p>
                 )}
@@ -108,13 +114,13 @@ export default function StateOfThePowerUnitComponent() {
                   <thead>
                     <tr>
                       <th>Параметр</th>
-                      <th>Статус</th>
+                      <th>Значение</th>
                     </tr>
                   </thead>
                   {/* Тело таблицы с данными. */}
                   <tbody>
                     {/* Проверка наличия данных о параметрах блока CL. */}
-                    {!!dataCL[key][0] ? (
+                    {!!dataCL[key]?.[0] ? (
                       // Фильтрация данных и отображение каждой строки таблицы для блока CL.
                       dataCL[key][0]
                         .slice(2)
@@ -136,7 +142,7 @@ export default function StateOfThePowerUnitComponent() {
                     )}
 
                     {/* Проверка наличия данных о параметрах блока DA1. */}
-                    {!!dataDA1[key][0] ? (
+                    {!!dataDA1[key]?.[0] ? (
                       // Фильтрация данных и отображение каждой строки таблицы для блока DA1.
                       dataDA1[key][0]
                         .slice(1)

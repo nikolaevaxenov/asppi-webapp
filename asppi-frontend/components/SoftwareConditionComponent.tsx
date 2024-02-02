@@ -16,9 +16,13 @@ import {
   IoIosArrowDropleftCircle,
   IoIosArrowDroprightCircle,
 } from "react-icons/io";
+import { useCarouselStore } from "@/hooks/useCarouselStore";
 
 // Экспортируемый по умолчанию функциональный компонент SoftwareConditionComponent.
 export default function SoftwareConditionComponent() {
+  const carouselIndex = useCarouselStore((state) => state.index);
+  const updateIndex = useCarouselStore((state) => state.updateIndex);
+
   // Используем хук useQuery для получения данных о состоянии программного обеспечения.
   const { isLoading, error, data, isFetching } = useQuery("rcData", getRC, {
     refetchInterval: 60000, // Интервал автоматического обновления данных в миллисекундах.
@@ -47,6 +51,8 @@ export default function SoftwareConditionComponent() {
             <IoIosArrowDroprightCircle />
           </button>
         )}
+        slideIndex={carouselIndex}
+        afterSlide={updateIndex}
       >
         {/* Проверка наличия данных перед отображением таблиц. */}
         {!!data ? (
@@ -55,7 +61,7 @@ export default function SoftwareConditionComponent() {
             return (
               <div>
                 {/* Заголовок с информацией о блоке данных. */}
-                <p>Информация по блоку {key}</p>
+                <p>Информация о блоке {key}</p>
 
                 {/* Таблица с данными о состоянии программного обеспечения. */}
                 <table>
@@ -69,7 +75,7 @@ export default function SoftwareConditionComponent() {
                   </thead>
                   {/* Тело таблицы с данными. */}
                   <tbody>
-                    {data[key][0].map((row) => (
+                    {data[key]?.[0].map((row) => (
                       <tr key={row[1]}>
                         {/* Форматирование даты и времени на русском языке. */}
                         <td>{new Date(row[0]).toLocaleString("ru-RU")}</td>
